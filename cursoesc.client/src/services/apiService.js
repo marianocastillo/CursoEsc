@@ -1,11 +1,10 @@
-
 import axios from "axios";
 
-const API_URL = "https://localhost:7086/api/Curso"; // URL base de la API
+const API_URL = "https://localhost:7086/api/Curso";  // Asegura que este endpoint es correcto
 
 export const apiService = {
   getCursos() {
-    return axios.get(API_URL); // Aquí no necesitas agregar "/Curso" porque ya está en API_URL
+    return axios.get(API_URL); // Ahora sí apunta a "/api/Curso"
   },
   getCurso(id) {
     return axios.get(`${API_URL}/${id}`);

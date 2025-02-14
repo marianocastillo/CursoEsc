@@ -1,9 +1,22 @@
 using CursoAPI.Models;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowVueApp", policy =>
+    {
+        policy.WithOrigins("https://localhost:51594")
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials();
+
+    });
+
+
+});
 
 builder.Services.AddControllers();
 
@@ -35,13 +48,17 @@ if (app.Environment.IsDevelopment())
 }
 
 
-app.UseDefaultFiles();
-app.UseStaticFiles();
+
 
 // Configure the HTTP request pipeline.
 
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowVueApp");
+
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.UseAuthorization();
 

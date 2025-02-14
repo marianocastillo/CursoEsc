@@ -18,7 +18,7 @@
               </router-link>
             </li>
             <li>
-              <router-link  class="nav-link px-0 align-middle">
+              <router-link to="/view" class="nav-link px-0 align-middle">
                 <i class="fs-4 bi-pencil-square"></i> <span class="ms-1 d-none d-sm-inline">Modificar</span>
               </router-link>
             </li>

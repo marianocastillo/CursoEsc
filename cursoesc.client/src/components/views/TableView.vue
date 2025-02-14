@@ -1,47 +1,57 @@
 <template>
   <div class="container">
     <!-- Botón para abrir el modal alineado a la derecha -->
-    <div class="d-flex justify-content-end w-100 mx-auto">
-      <button class="btn btn-primary mb-2 " data-toggle="modal" data-target="#squarespaceModal">
+    <div class="d-flex justify-content-end w-70 mx-auto">
+      <button class="btn btn-primary mb-2 me-2" data-toggle="modal" data-target="#squarespaceModal">
         Registrar Curso Nuevo
       </button>
     </div>
 
-    <!-- Tabla centrada y más grande -->
-    <div class="d-flex justify-content-center">
-      <table class="table table-striped table-bordered w-90">
-        <thead class="thead-dark">
-          <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Categoría</th>
-            <th>Precio</th>
-            <th>Cupon</th>
-            <th>Imagen</th>
-            <th>Status</th>
-            <th class="text-center">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="curso in cursos" :key="curso.iidcurso">
-            <td>{{ curso.iidcurso }}</td>
-            <td>{{ curso.nombre }}</td>
-            <td>{{ curso.descripcion }}</td>
-            <td>{{ curso.precio }}</td>
-            <td>{{ curso.cupon }}</td>
-            <td><img :src="curso.imagen" alt="Imagen" width="50" /></td>
-            <td>
-              <span v-if="curso.bhabilitado === 1" class="badge bg-success">Activo</span>
-              <span v-else class="badge bg-danger">Inactivo</span>
-            </td>
-            <td class="text-center">
-              <a class="btn btn-info btn-sm me-1" data-toggle="modal" data-target="#squarespaceModal"><span class="glyphicon glyphicon-edit"></span> Edit</a>
-              <a class="btn btn-danger btn-sm" href="#"><span class="glyphicon glyphicon-remove"></span> Del</a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="sidebar-container">
+      <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+          <thead class="thead-dark">
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Categoría</th>
+              <th>Precio</th>
+              <th>Cupon</th>
+              <th>Status</th>
+              <th>Imagen</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="curso in cursos" :key="curso.iidcurso">
+              <td>{{ curso.iidcurso }}</td>
+              <td>{{ curso.nombre }}</td>
+              <td>{{ curso.descripcion }}</td>
+              <td>{{ curso.categoria }}</td>
+              <td>${{ curso.precio }}</td>
+              <td>{{ curso.cupon }}</td>
+              <td>
+                <span v-if="curso.bhabilitado === 1" class="badge bg-success">Activo</span>
+                <span v-else class="badge bg-danger">Inactivo</span>
+              </td>
+              <td>
+                <img :src="curso.imagen" alt="Imagen" class="img-thumbnail" width="50" />
+              </td>
+              <td class="text-center">
+                <div class="d-flex justify-content-center gap-1">
+                 <button class="btn btn-info btn-sm px-2 py-1" data-toggle="modal" data-target="#squarespaceModal">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="btn btn-danger btn-sm px-2 py-1" @click="eliminarCurso(curso.iidcurso)">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Modal centrado en la pantalla -->
@@ -118,11 +128,12 @@
       async obtenerCursos() {
         try {
           const response = await apiService.getCursos();
-          this.cursos = response.data; // Asigna los datos de la API
+          console.log("Datos recibidos de la API:", response.data); // Verifica si la API responde correctamente
+          this.cursos = response.data;
         } catch (error) {
           console.error("Error al obtener los cursos:", error);
         }
-      },
+      }
     },
     mounted() {
       this.obtenerCursos(); // Llama a la API al cargar el componente
@@ -134,5 +145,22 @@
   /* Estilos opcionales */
   .table {
     max-width: 90%;
+  }
+</style>
+
+
+<style scoped>
+  .sidebar-container {
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   }
 </style>
