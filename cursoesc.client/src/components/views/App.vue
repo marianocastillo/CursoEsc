@@ -8,13 +8,13 @@
           </a>
           <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
             <li class="nav-item">
-              <router-link to="/view" class="nav-link align-middle px-0">
+              <router-link to="/registro" class="nav-link align-middle px-0">
                 <i class="fs-4 bi-house"></i> <span class="ms-1 d-none d-sm-inline">Home</span>
               </router-link>
             </li>
             <li>
               <router-link to="/registro" class="nav-link px-0 align-middle">
-                <i class="fs-4 bi-card-checklist"></i> <span class="ms-1 d-none d-sm-inline">Registro</span>
+                <i class="fs-4 bi-card-checklist"></i> <span class="ms-1 d-none d-sm-inline">Registros</span>
               </router-link>
             </li>
             <li>
