@@ -1,21 +1,36 @@
 import axios from "axios";
 
-const API_URL = "https://localhost:7086/api/Curso";  // Asegura que este endpoint es correcto
+const API_URL = "https://localhost:44393/api/Curso";
 
-export const apiService = {
+const apiService = {
+  // Obtener todos los cursos
   getCursos() {
-    return axios.get(API_URL); // Ahora sí apunta a "/api/Curso"
+    return axios.get(API_URL);
   },
+
+  // Obtener un curso por su ID
   getCurso(id) {
     return axios.get(`${API_URL}/${id}`);
   },
-  createCurso(data) {
-    return axios.post(API_URL, data);
+
+  // Crear un nuevo curso
+  createCurso(curso) {
+    return axios.post(API_URL, curso, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
   },
+
+  // Actualizar un curso existente
   updateCurso(id, data) {
     return axios.put(`${API_URL}/${id}`, data);
   },
+
+  // Eliminar un curso
   deleteCurso(id) {
     return axios.delete(`${API_URL}/${id}`);
   },
 };
+
+export { apiService };

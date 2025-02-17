@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using CursoAPI.Models;
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Threading.Tasks;
+using CursoAPI.Models;
 
 namespace CursoEsc.Server.Controllers
 {
@@ -12,10 +12,12 @@ namespace CursoEsc.Server.Controllers
     public class CursoController : ControllerBase
     {
         private readonly BdcursoContext _context;
+        private readonly ILogger<CursoController> _logger;
 
-        public CursoController(BdcursoContext context)
+        public CursoController(BdcursoContext context,   ILogger<CursoController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -24,6 +26,8 @@ namespace CursoEsc.Server.Controllers
             var cursos = await _context.Cursos.ToListAsync();
             return Ok(cursos);
         }
+
+
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Curso>> GetCurso(int id)
@@ -36,13 +40,32 @@ namespace CursoEsc.Server.Controllers
             return Ok(curso);
         }
 
+
+
         [HttpPost]
-        public async Task<ActionResult<Curso>> PostCurso(Curso curso)
+        public async Task<IActionResult> CreateCurso([FromBody] Curso curso)
         {
-            _context.Cursos.Add(curso);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetCurso), new { id = curso.Iidcurso }, curso);
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                _context.Cursos.Add(curso);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction(nameof(GetCurso), new { id = curso.Iidcurso }, curso);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al crear el curso.");
+                return StatusCode(500, "Error al crear el curso.");
+            }
         }
+
+
+
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCurso(int id, [FromBody] Curso curso)
@@ -73,6 +96,10 @@ namespace CursoEsc.Server.Controllers
             return NoContent();
         }
 
+
+
+
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCurso(int id)
         {
@@ -95,10 +122,6 @@ namespace CursoEsc.Server.Controllers
 
             return NoContent();
         }
-
-
-
-
 
 
 

@@ -24,7 +24,7 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<BdcursoContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -37,6 +37,8 @@ builder.Services.AddSwaggerGen(c =>
 
 
 var app = builder.Build();
+app.UseCors("AllowVueApp");
+
 
 if (app.Environment.IsDevelopment())
 {
@@ -55,10 +57,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowVueApp");
-
 app.UseDefaultFiles();
 app.UseStaticFiles();
+
 
 app.UseAuthorization();
 
