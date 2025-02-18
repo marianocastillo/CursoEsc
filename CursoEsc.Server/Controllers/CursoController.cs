@@ -65,63 +65,51 @@ namespace CursoEsc.Server.Controllers
         }
 
 
-
-
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCurso(int id, [FromBody] Curso curso)
+        public async Task<IActionResult> UpdateCurso(int id, [FromBody] Curso curso)
         {
-            if (id != curso.Iidcurso)
+            var cursoExistente = await _context.Cursos.FindAsync(id);
+            if (cursoExistente == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            _context.Entry(curso).State = EntityState.Modified;
+            // Actualizar solo las propiedades proporcionadas en el cuerpo de la solicitud
+            cursoExistente.Nombre = curso.Nombre;
+            cursoExistente.Descripcion = curso.Descripcion;
+            // ... actualizar otras propiedades
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Cursos.Any(c => c.Iidcurso == id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
 
-
-
-
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCurso(int id)
         {
+            Console.WriteLine($"Eliminando curso con ID: {id}");  // Verifica si el método llega al servidor
             var curso = await _context.Cursos.FindAsync(id);
             if (curso == null)
             {
                 return NotFound();
             }
 
-            // Buscar y eliminar secciones asociadas
+            // Eliminar las secciones asociadas
             var secciones = _context.SeccionCursos.Where(s => s.Iidcurso == id).ToList();
             if (secciones.Any())
             {
                 _context.SeccionCursos.RemoveRange(secciones);
             }
 
-            // Ahora sí, eliminar el curso
+            // Eliminar el curso
             _context.Cursos.Remove(curso);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
+
+
 
 
 
