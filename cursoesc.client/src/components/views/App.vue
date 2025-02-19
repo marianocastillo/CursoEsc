@@ -8,17 +8,17 @@
           </a>
           <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
             <li class="nav-item">
-              <router-link to="/registro" class="nav-link align-middle px-0">
+              <router-link to="/home" class="nav-link align-middle px-0">
                 <i class="fs-4 bi-house text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Home</span>
               </router-link>
             </li>
             <li>
               <router-link to="/registro" class="nav-link px-0 align-middle">
-                <i class="fs-4 bi-card-checklist text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Registros</span>
+                <i class="fs-4 bi-card-checklist text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Registrar</span>
               </router-link>
             </li>
             <li>
-              <router-link to="/view" class="nav-link px-0 align-middle"> 
+              <router-link to="/edit" class="nav-link px-0 align-middle"> 
                 <i class="fs-4 bi-pencil-square text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Modificar</span>
               </router-link>
             </li>

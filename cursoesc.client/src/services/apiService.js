@@ -23,8 +23,8 @@ const apiService = {
   },
 
   // Actualizar un curso existente
-  updateCurso(id, data) {
-    return axios.put(`${API_URL}/${id}`, data);
+  updateCurso(iidcurso, data) {
+    return axios.put(`${API_URL}/${iidcurso}`, data);
   },
 
   // Eliminar un curso

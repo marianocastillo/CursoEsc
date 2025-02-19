@@ -1,6 +1,10 @@
 <template>
+  <div class="d-flex justify-content-center w-70 mx-auto">
+    <h3>Registro de Curso</h3>
+
+  </div>
   <div class="container">
-     <div class="sidebar-container">
+    <div class="sidebar-container">
       <div class="table-responsive">
         <table class="table table-striped table-bordered">
           <thead class="thead-dark">
@@ -8,12 +12,12 @@
               <th>ID</th>
               <th>Nombre</th>
               <th>Descripción</th>
-              <th>Categoría</th>
+              <th>IidCategoríaCurso</th>
               <th>Precio</th>
               <th>Cupon</th>
               <th>Status</th>
               <th>Imagen</th>
-             
+
             </tr>
           </thead>
           <tbody>
@@ -21,7 +25,7 @@
               <td>{{ curso.iidcurso }}</td>
               <td>{{ curso.nombre }}</td>
               <td>{{ curso.descripcion }}</td>
-              <td>{{ curso.categoria }}</td>
+              <td>{{ curso.iidcategoriacurso }}</td>
               <td>${{ curso.precio }}</td>
               <td>{{ curso.cupon }}</td>
               <td>
@@ -29,9 +33,9 @@
                 <span v-else class="badge bg-danger">Inactivo</span>
               </td>
               <td>
-                <img :src="curso.imagen" alt="Imagen" class="img-thumbnail" width="50" />
+                <img v-if="curso.ImagenUrl" :src="curso.ImagenUrl" alt="Imagen del curso" style="width: 200px; height: auto;">
               </td>
-             
+
             </tr>
           </tbody>
         </table>

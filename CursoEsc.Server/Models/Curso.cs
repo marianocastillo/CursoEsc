@@ -11,6 +11,7 @@ public partial class Curso
 
     public string? Descripcion { get; set; }
 
+
     public int? Iidcategoriacurso { get; set; }
 
     public decimal Precio { get; set; }

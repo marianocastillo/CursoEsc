@@ -15,12 +15,12 @@
               <th>ID</th>
               <th>Nombre</th>
               <th>Descripción</th>
-              <th>Categoría</th>
+              <th>IidCategoríaCurso</th>
               <th>Precio</th>
               <th>Cupon</th>
               <th>Status</th>
               <th>Imagen</th>
-              <th class="text-center">Acciones</th>
+              
             </tr>
           </thead>
           <tbody>
@@ -28,7 +28,7 @@
               <td>{{ curso.iidcurso }}</td>
               <td>{{ curso.nombre }}</td>
               <td>{{ curso.descripcion }}</td>
-              <td>{{ curso.categoria }}</td>
+              <td>{{ curso.iidcategoriacurso }}</td>
               <td>${{ curso.precio }}</td>
               <td>{{ curso.cupon }}</td>
               <td>
@@ -36,18 +36,9 @@
                 <span v-else class="badge bg-danger">Inactivo</span>
               </td>
               <td>
-                <img :src="curso.imagen" alt="Imagen" class="img-thumbnail" width="50" />
+                <img v-if="curso.ImagenUrl" :src="curso.ImagenUrl" alt="Imagen del curso" style="width: 200px; height: auto;">
               </td>
-              <td class="text-center">
-                <div class="d-flex justify-content-center gap-1">
-                  <button class="btn btn-info btn-sm px-2 py-1" data-toggle="modal" data-target="#squarespaceModal" @click="editarCurso(curso)">
-                    <i class="bi bi-pencil"></i>
-                  </button>
-                  <button class="btn btn-danger btn-sm px-2 py-1" @click="eliminarCurso(curso.iidcurso)">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </div>
-              </td>
+              
             </tr>
           </tbody>
         </table>
@@ -79,7 +70,7 @@
 
               <div class="form-group">
                 <label for="categoria">Categoría</label>
-                <input type="text" class="form-control" id="categoria" v-model="curso.categoria" placeholder="Categoría" />
+                <input type="number" class="form-control" id="iidcategoriacurso" v-model="curso.iidcategoriacurso" placeholder="Categoría" />
               </div>
 
               <div class="form-group">
@@ -96,7 +87,7 @@
                 <label for="imagen">Imagen</label>
                 <input type="file" id="imagen" @change="handleFileUpload" />
                 <div v-if="curso.previewImagen" class="mt-2">
-                  <img :src="curso.previewImagen" alt="Vista previa" class="img-thumbnail" width="100" />
+                  <img v-if="curso.ImagenUrl" :src="curso.ImagenUrl" alt="Imagen del curso" class="curso-imagen">
                 </div>
               </div>
 
@@ -122,7 +113,7 @@
           </div>
 
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" >Cerrar</button>
           </div>
         </div>
       </div>
@@ -141,7 +132,7 @@
         curso: {
           nombre: "",
           descripcion: "",
-          categoria: "",
+          iidcategoriacurso: "",
           precio: "",
           cupon: "",
           imagen: undefined, 
@@ -178,7 +169,6 @@
       },
 
      
-
       async obtenerCursos() {
         try {
           const response = await apiService.getCursos();
@@ -194,13 +184,14 @@
         try {
           // Excluir imagen si no se desea actualizar
           const data = {
+
             nombre: curso.nombre,
             descripcion: curso.descripcion,
-            categoria: curso.categoria,
+            Iidcategoriacurso: curso.Iidcategoriacurso,
             precio: curso.precio,
             cupon: curso.cupon,
             bhabilitado: curso.bhabilitado,
-            imagen: undefined, // No actualizamos la imagen
+            imagen: Null // No actualizamos la imagen
           };
 
           // Hacer la solicitud PUT a la API
@@ -227,19 +218,19 @@
       // Método para realizar la actualización en el formulario
       async actualizarCurso() {
         try {
-          if (!this.curso.Iidcurso) {
+          if (!this.curso.iidcurso) {
             console.error("Error: El curso no tiene un ID válido");
             return;
           }
 
           // Llamar al método updateCurso para actualizar el curso
-          await this.updateCurso(this.curso.Iidcurso, this.curso);
+          await this.updateCurso(this.curso.iidcurso, this.curso);
 
           // Resetear el formulario después de la actualización
           this.curso = {
             nombre: "",
             descripcion: "",
-            categoria: "",
+            Iidcategoriacurso: "",
             precio: "",
             cupon: "",
             imagen: null,
@@ -250,6 +241,12 @@
           console.error("Error al actualizar el curso:", error);
         }
       },
+
+
+
+
+
+
 
 
       async eliminarCurso(id) {
@@ -274,22 +271,24 @@
           const formData = new FormData();
           formData.append("nombre", this.curso.nombre);
           formData.append("descripcion", this.curso.descripcion);
-          formData.append("categoria", this.curso.categoria);
+          formData.append("Iidcategoriacurso", this.curso.Iidcategoriacurso);
           formData.append("precio", this.curso.precio);
           formData.append("cupon", this.curso.cupon);
           formData.append("bhabilitado", this.curso.bhabilitado); // Corregido para enviar el estado
           if (this.curso.imagen) {
             formData.append("imagen", this.curso.imagen);
           }
-
-          await apiService.createCurso(formData);
-          alert("Curso creado exitosamente");
+         
+            await apiService.createCurso(formData);
+            alert("Curso creado exitosamente");    
+         
+                       
           
           // Resetear formulario
           this.curso = {
             nombre: "",
             descripcion: "",
-            categoria: "",
+            Iidcategoriacurso: "",
             precio: "",
             cupon: "",
             imagen: null,
@@ -303,7 +302,7 @@
     },
     mounted() {
       this.obtenerCursos();
-
+            
     },
   };
 </script>
@@ -352,5 +351,23 @@
 
   .img-thumbnail {
     max-height: 100px;
+  }
+
+
+  .curso-card {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 5px;
+    width: 300px;
+    text-align: center;
+  }
+
+  .curso-imagen {
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 5px;
   }
 </style>

@@ -20,12 +20,53 @@ namespace CursoEsc.Server.Controllers
             _logger = logger;
         }
 
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<Curso>>> GetCursos()
+        //{
+        //    var cursos = await _context.Cursos.ToListAsync();
+        //    return Ok(cursos);
+        //}
+
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Curso>>> GetCursos()
-        {
-            var cursos = await _context.Cursos.ToListAsync();
-            return Ok(cursos);
-        }
+public async Task<ActionResult<IEnumerable<object>>> GetCursos()
+{
+    try
+    {
+        var baseUrl = $"{Request.Scheme}://{Request.Host}/"; // Obtiene la URL base del servidor
+
+        var cursos = await _context.Cursos
+            .Select(curso => new {
+                curso.Iidcurso,
+                curso.Nombre,
+                curso.Descripcion,
+                //curso.Categoria,
+                curso.Precio,
+                curso.Cupon,
+                curso.Bhabilitado,
+                ImagenUrl = curso.Imagen != null ? $"{baseUrl}imagenes/{curso.Imagen}" : null
+            })
+            .ToListAsync();
+
+        return Ok(cursos);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, $"Error interno: {ex.Message}");
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -39,7 +80,6 @@ namespace CursoEsc.Server.Controllers
             }
             return Ok(curso);
         }
-
 
 
         [HttpPost]
@@ -65,51 +105,63 @@ namespace CursoEsc.Server.Controllers
         }
 
 
+
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCurso(int id, [FromBody] Curso curso)
+        public async Task<IActionResult> PutCurso(int id, [FromForm] Curso curso)
         {
-            var cursoExistente = await _context.Cursos.FindAsync(id);
-            if (cursoExistente == null)
+            if (id != curso.Iidcurso)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            // Actualizar solo las propiedades proporcionadas en el cuerpo de la solicitud
-            cursoExistente.Nombre = curso.Nombre;
-            cursoExistente.Descripcion = curso.Descripcion;
-            // ... actualizar otras propiedades
+            _context.Entry(curso).State = EntityState.Modified;
 
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.Cursos.Any(c => c.Iidcurso == id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
             return NoContent();
         }
 
 
+
+
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCurso(int id)
         {
-            Console.WriteLine($"Eliminando curso con ID: {id}");  // Verifica si el método llega al servidor
             var curso = await _context.Cursos.FindAsync(id);
             if (curso == null)
             {
                 return NotFound();
             }
 
-            // Eliminar las secciones asociadas
+            // Buscar y eliminar secciones asociadas
             var secciones = _context.SeccionCursos.Where(s => s.Iidcurso == id).ToList();
             if (secciones.Any())
             {
                 _context.SeccionCursos.RemoveRange(secciones);
             }
 
-            // Eliminar el curso
+            // Ahora sí, eliminar el curso
             _context.Cursos.Remove(curso);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
-
-
 
 
 
