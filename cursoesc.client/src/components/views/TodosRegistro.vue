@@ -49,7 +49,7 @@
   import { apiService } from "@/services/apiService"; // Importa la API
 
   export default {
-    name: "TableView",
+    name: "TodosRegistro",
     data() {
       return {
         cursos: [], // Almacena los cursos

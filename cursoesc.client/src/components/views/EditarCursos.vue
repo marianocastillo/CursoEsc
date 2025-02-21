@@ -3,7 +3,7 @@
     <!-- Botón para abrir el modal alineado a la derecha -->
     <div class="d-flex justify-content-center w-70 mx-auto">
       <h3>Actualiza Registro de Curso</h3>
-        
+
       </div>
 
     <div class="sidebar-container">
@@ -130,14 +130,14 @@
 </template>
 
 <script>
-  const API_URL = "https://localhost:44393/api/Curso";
+import { apiService } from "@/services/apiService";
+import axios from "axios";
 
 
-  import axios from 'axios';
-  import { apiService } from "@/services/apiService";
+
 
   export default {
-    name: "TableView",
+    name: "EditarCursos",
     data() {
       return {
         curso: {
@@ -149,7 +149,7 @@
           imagen: undefined,
           previewImagen: null, // Para mostrar la imagen en el frontend
           bhabilitado: 0 // 0 = Inactivo, 1 = Activo
-         
+
 
         },
         cursos: [],
@@ -164,115 +164,38 @@
         }
       },
 
+      async updateCurso(id, curso) {
+       try {
+        const formData = new FormData();
+         formData.append("Nombre", curso.nombre);
+         formData.append("Descripcion", curso.descripcion);
+         formData.append("Iidcategoriacurso", curso.iidcategoriacurso);
+         formData.append("Precio", curso.precio);
+         formData.append("Cupon", curso.cupon);
+         formData.append("Bhabilitado", curso.bhabilitado);
 
-   
+         // Si hay una imagen nueva, la agregamos al formData
+         if (curso.imagen) {
+           formData.append("Imagen", curso.imagen);
+         }
 
-      async obtenerCursos() {
-        try {
-          const response = await apiService.getCursos();
-          console.log("Datos recibidos de la API:", response.data);
-          this.cursos = response.data;
-        } catch (error) {
-          console.error("Error al obtener los cursos:", error);
-        }
+         await axios.put(`/api/Curso/${id}`, formData, {
+           headers: {
+             "Content-Type": "multipart/form-data",
+           },
+         });
+
+         // Actualizar la lista local si la API responde correctamente
+         const index = this.cursos.findIndex(c => c.Iidcurso === id);
+         if (index !== -1) {
+           this.cursos[index] = { ...curso };
+         }
+
+         alert("Curso actualizado exitosamente");
+       } catch (error) {
+         console.error("Error al actualizar el curso:", error);
+       }
       },
-      async updateCurso() {
-        try {
-          const formData = new FormData();
-          formData.append("nombre", this.curso.nombre);
-          formData.append("descripcion", this.curso.descripcion);
-          formData.append("iidcategoriacurso", this.curso.iidcategoriacurso);
-          formData.append("precio", this.curso.precio);
-          formData.append("cupon", this.curso.cupon);
-          formData.append("bhabilitado", this.curso.bhabilitado);
-
-          // Si se sube una nueva imagen, agregarla al FormData
-          if (this.curso.imagen) {
-            formData.append("imagen", this.curso.imagen);
-          }
-
-          // Enviar la actualización a la API
-          const response = await axios.put(`${API_URL}/${this.curso.iidcurso}`, formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          });
-
-          // Verificar la respuesta
-          if (response.status === 204) {
-            this.obtenerCursos();
-            alert("Curso actualizado exitosamente");
-          } else {
-            alert("Error al actualizar el curso");
-          }
-        } catch (error) {
-          console.error("Error al actualizar el curso:", error);
-          alert("Ocurrió un error al intentar actualizar el curso.");
-        }
-      },
-
-
-      //async updateCurso() {
-      //  try {
-      //    const formData = new FormData();
-      //    formData.append("nombre", this.curso.nombre);
-      //    formData.append("descripcion", this.curso.descripcion);
-      //    formData.append("iidcategoriacurso", this.curso.iidcategoriacurso);
-      //    formData.append("precio", this.curso.precio);
-      //    formData.append("cupon", this.curso.cupon);
-      //    formData.append("bhabilitado", this.curso.bhabilitado);
-
-      //    // Si se sube una nueva imagen, agregarla al FormData
-      //    if (this.curso.imagen) {
-      //      formData.append("imagen", this.curso.imagen);
-      //    }
-
-      //    // Enviar la actualización a la API
-      //    await axios.put(`/api/Curso/${this.curso.iidcurso}`, formData, {
-      //      headers: {
-      //        "Content-Type": "multipart/form-data",
-      //      },
-      //    });
-
-      //    // Recargar los cursos y cerrar el modal
-      //    this.obtenerCursos();
-      //    alert("Curso actualizado exitosamente");
-      //  } catch (error) {
-      //    console.error("Error al actualizar el curso:", error);
-      //  }
-      //},
-      //async updateCurso(iidcurso, curso) {
-      //  try {
-      //    let formData = new FormData();
-      //    formData.append("nombre", curso.nombre);
-      //    formData.append("descripcion", curso.descripcion);
-      //    formData.append("iidcategoriacurso", curso.iidcategoriacurso);
-      //    formData.append("precio", curso.precio);
-      //    formData.append("cupon", curso.cupon);
-      //    formData.append("bhabilitado", curso.bhabilitado);
-
-      //    // Si hay una imagen nueva, la agregamos al formData
-      //    if (curso.imagen) {
-      //      formData.append("imagen", curso.imagen);
-      //    }
-
-      //    await axios.put(`/api/Curso/${iidcurso}`, formData, {
-      //      headers: {
-      //        "Content-Type": "multipart/form-data",
-      //      },
-      //    });
-
-      //    // Actualizar la lista local si la API responde correctamente
-      //    const index = this.cursos.findIndex(c => c.Iidcurso === iidcurso);
-      //    if (index !== -1) {
-      //      this.cursos[index] = { ...curso };
-      //    }
-
-      //    alert("Curso actualizado exitosamente");
-      //  } catch (error) {
-      //    console.error("Error al actualizar el curso:", error);
-      //  }
-      //},
 
 
       // Método para editar un curso (llamado desde la vista)
@@ -281,32 +204,41 @@
       },
 
       // Método para realizar la actualización en el formulario
-      //async actualizarCurso() {
-      //  try {
-      //    if (!this.curso.iidcurso) {
-      //      console.error("Error: El curso no tiene un ID válido");
-      //      return;
-      //    }
+      async actualizarCurso() {
+        try {
+          if (!this.curso.iidcurso) {
+            console.error("Error: El curso no tiene un ID válido");
+            return;
+          }
 
-      //    // Llamar al método updateCurso para actualizar el curso
-      //    await this.updateCurso(this.curso.iidcurso, this.curso);
+          // Llamar al método updateCurso para actualizar el curso
+          await this.updateCurso(this.curso.iidcurso, this.curso);
 
-      //    // Resetear el formulario después de la actualización
-      //    this.curso = {
-      //      nombre: "",
-      //      descripcion: "",
-      //      iidcategoriacurso: "",
-      //      precio: "",
-      //      cupon: "",
-      //      imagen: null,
-      //      previewImagen: null,
-      //      bhabilitado: 0,
-      //    };
-      //  } catch (error) {
-      //    console.error("Error al actualizar el curso:", error);
-      //  }
-      //},
+          // Resetear el formulario después de la actualización
+          this.curso = {
+            nombre: "",
+            descripcion: "",
+            iidcategoriacurso: "",
+            precio: "",
+            cupon: "",
+            imagen: null,
+            previewImagen: null,
+            bhabilitado: 0,
+          };
+        } catch (error) {
+          console.error("Error al actualizar el curso:", error);
+        }
+      },
 
+      async obtenerCursos() {
+      try {
+        const response = await apiService.getCursos();
+        console.log("Datos recibidos de la API:", response.data);
+        this.cursos = response.data;
+      } catch (error) {
+        console.error("Error al obtener los cursos:", error);
+      }
+    },
 
 
 
@@ -331,45 +263,7 @@
       },
 
 
-      //async guardarCurso() {
-      //  try {
-      //    const formData = new FormData();
-      //    formData.append("nombre", this.curso.nombre);
-      //    formData.append("descripcion", this.curso.descripcion);
-      //    formData.append("categoria", this.curso.categoria);
-      //    formData.append("precio", this.curso.precio);
-      //    formData.append("cupon", this.curso.cupon);
-      //    formData.append("bhabilitado", this.curso.bhabilitado); // Corregido para enviar el estado
-      //    if (this.curso.imagen) {
-      //      formData.append("imagen", this.curso.imagen);
-      //    }
-      //    if (this.curso.iidcurso == 0) {
-      //      await apiService.createCurso(formData);
-      //    }
-      //    else {
-      //      console.log(this.curso.iidcurso)
-      //      formData.append("iidcurso", this.curso.iidcurso);
-      //      await apiService.updateCurso(this.curso.iidcurso, formData);
-      //    }
 
-
-      //    alert("Curso creado exitosamente");
-
-      //    // Resetear formulario
-      //    this.curso = {
-      //      nombre: "",
-      //      descripcion: "",
-      //      categoria: "",
-      //      precio: "",
-      //      cupon: "",
-      //      imagen: null,
-      //      previewImagen: null,
-      //      bhabilitado: 0,
-      //    };
-      //  } catch (error) {
-      //    console.error("Error al crear el curso:", error);
-      //  }
-      //}
     },
     mounted() {
       this.obtenerCursos();

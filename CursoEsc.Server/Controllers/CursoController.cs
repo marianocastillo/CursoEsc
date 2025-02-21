@@ -20,6 +20,19 @@ namespace CursoEsc.Server.Controllers
             _logger = logger;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetCursos()
+        {
+            try
+            {
+                var cursos = await _context.Cursos.ToListAsync();
+                return Ok(cursos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error en la API: {ex.Message} - {ex.InnerException}");
+            }
+        }
         //[HttpGet]
         //public async Task<ActionResult<IEnumerable<Curso>>> GetCursos()
         //{
@@ -27,33 +40,33 @@ namespace CursoEsc.Server.Controllers
         //    return Ok(cursos);
         //}
 
-        [HttpGet]
-public async Task<ActionResult<IEnumerable<object>>> GetCursos()
-{
-    try
-    {
-        var baseUrl = $"{Request.Scheme}://{Request.Host}/"; // Obtiene la URL base del servidor
+        //        [HttpGet]
+        //public async Task<ActionResult<IEnumerable<object>>> GetCursos()
+        //{
+        //    try
+        //    {
+        //        var baseUrl = $"{Request.Scheme}://{Request.Host}/"; // Obtiene la URL base del servidor
 
-        var cursos = await _context.Cursos
-            .Select(curso => new {
-                curso.Iidcurso,
-                curso.Nombre,
-                curso.Descripcion,
-                //curso.Categoria,
-                curso.Precio,
-                curso.Cupon,
-                curso.Bhabilitado,
-                ImagenUrl = curso.Imagen != null ? $"{baseUrl}imagenes/{curso.Imagen}" : null
-            })
-            .ToListAsync();
+        //        var cursos = await _context.Cursos
+        //            .Select(curso => new {
+        //                curso.Iidcurso,
+        //                curso.Nombre,
+        //                curso.Descripcion,
+        //                //curso.Categoria,
+        //                curso.Precio,
+        //                curso.Cupon,
+        //                curso.Bhabilitado,
+        //                ImagenUrl = curso.Imagen != null ? $"{baseUrl}imagenes/{curso.Imagen}" : null
+        //            })
+        //            .ToListAsync();
 
-        return Ok(cursos);
-    }
-    catch (Exception ex)
-    {
-        return StatusCode(500, $"Error interno: {ex.Message}");
-    }
-}
+        //        return Ok(cursos);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"Error interno: {ex.Message}");
+        //    }
+        //}
 
 
 
@@ -81,15 +94,38 @@ public async Task<ActionResult<IEnumerable<object>>> GetCursos()
             return Ok(curso);
         }
 
-
         [HttpPost]
-        public async Task<IActionResult> CreateCurso([FromBody] Curso curso)
+        public async Task<IActionResult> CreateCurso([FromForm] Curso curso, [FromForm] IFormFile? ImagenFile)
         {
             try
             {
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
+                }
+
+                // Procesar la imagen si se envió
+                if (ImagenFile != null)
+                {
+                    // Definir la carpeta donde se guardará la imagen (por ejemplo, wwwroot/images)
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    // Crear un nombre único para el archivo
+                    var uniqueFileName = $"{Guid.NewGuid()}_{ImagenFile.FileName}";
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    // Guardar el archivo en el servidor
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await ImagenFile.CopyToAsync(stream);
+                    }
+
+                    // Asignar la ruta relativa al modelo
+                    curso.Imagen = "/images/" + uniqueFileName;
                 }
 
                 _context.Cursos.Add(curso);
@@ -107,7 +143,10 @@ public async Task<ActionResult<IEnumerable<object>>> GetCursos()
 
 
 
-        [HttpPut("{id}")]
+
+
+
+        [HttpPut()]
         public async Task<IActionResult> PutCurso(int id, [FromForm] Curso curso)
         {
             if (id != curso.Iidcurso)

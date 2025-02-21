@@ -1,6 +1,9 @@
 using CursoAPI.Models;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,11 +31,14 @@ builder.Services.AddDbContext<BdcursoContext>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    c.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "CursoController",
         Version = "v1"
     });
+
+    // Habilitar soporte para carga de archivos
+    c.OperationFilter<CursoEsc.Server.SwaggerFileUploadOperationFilter>();
 });
 
 
