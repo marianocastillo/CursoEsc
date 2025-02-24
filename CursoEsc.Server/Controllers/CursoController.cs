@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using CursoAPI.Models;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace CursoEsc.Server.Controllers
 {
@@ -146,23 +147,28 @@ namespace CursoEsc.Server.Controllers
 
 
 
-        [HttpPut()]
-        public async Task<IActionResult> PutCurso(int id, [FromForm] Curso curso)
+        [HttpPut("{iidcurso}")]
+        public async Task<IActionResult> PutCurso(int iidcurso, [FromForm] Curso curso)
         {
-            if (id != curso.Iidcurso)
+
+            var cursoid = (from c in _context.Cursos
+                           where c.Iidcurso.Equals(iidcurso)
+                           select c.Iidcurso);         
+   
+
+            if (iidcurso != curso.Iidcurso)
             {
                 return BadRequest();
             }
 
             _context.Entry(curso).State = EntityState.Modified;
-
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!_context.Cursos.Any(c => c.Iidcurso == id))
+                if (!_context.Cursos.Any(c => c.Iidcurso == iidcurso))
                 {
                     return NotFound();
                 }
@@ -171,9 +177,10 @@ namespace CursoEsc.Server.Controllers
                     throw;
                 }
             }
-
             return NoContent();
         }
+
+
 
 
 

@@ -15,7 +15,7 @@
               <th>ID</th>
               <th>Nombre</th>
               <th>Descripción</th>
-              <th>IidCategoríaCurso</th>
+              <th>Categoria</th>
               <th>Precio</th>
               <th>Cupon</th>
               <th>Status</th>
@@ -211,7 +211,7 @@ export default {
           });
           if (response.status === 201) {
             alert("Curso creado exitosamente");
-            
+
           } else {
             alert("Error al crear el curso");
           }

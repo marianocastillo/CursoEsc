@@ -12,7 +12,7 @@
               <th>ID</th>
               <th>Nombre</th>
               <th>Descripción</th>
-              <th>IidCategoríaCurso</th>
+              <th>Categoria</th>
               <th>Precio</th>
               <th>Cupon</th>
               <th>Status</th>
@@ -56,6 +56,22 @@
       };
     },
     methods: {
+      handleFileUpload(event) {
+      const file = event.target.files[0];
+      this.curso.imagen = file;
+
+      // Mostrar una vista previa de la imagen
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.curso.previewImagen = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    },
+
+
+
       async obtenerCursos() {
         try {
           const response = await apiService.getCursos();

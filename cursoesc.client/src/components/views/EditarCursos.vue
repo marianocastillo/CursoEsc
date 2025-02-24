@@ -14,7 +14,7 @@
               <th>ID</th>
               <th>Nombre</th>
               <th>Descripción</th>
-              <th>IidCategoríaCurso</th>
+              <th>Categoria</th>
               <th>Precio</th>
               <th>Cupon</th>
               <th>Status</th>
@@ -131,7 +131,8 @@
 
 <script>
 import { apiService } from "@/services/apiService";
-import axios from "axios";
+  import axios from "axios";
+  const API_URL = "https://localhost:44393/api/Curso";
 
 
 
@@ -157,64 +158,60 @@ import axios from "axios";
     },
     methods: {
       handleFileUpload(event) {
-        const file = event.target.files[0];
-        if (file) {
-          this.curso.imagen = file;
-          this.curso.previewImagen = URL.createObjectURL(file);
-        }
-      },
+      const file = event.target.files[0];
+      this.curso.imagen = file;
 
-      async updateCurso(id, curso) {
-       try {
-        const formData = new FormData();
-         formData.append("Nombre", curso.nombre);
-         formData.append("Descripcion", curso.descripcion);
-         formData.append("Iidcategoriacurso", curso.iidcategoriacurso);
-         formData.append("Precio", curso.precio);
-         formData.append("Cupon", curso.cupon);
-         formData.append("Bhabilitado", curso.bhabilitado);
+      // Mostrar una vista previa de la imagen
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.curso.previewImagen = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    },
 
-         // Si hay una imagen nueva, la agregamos al formData
-         if (curso.imagen) {
-           formData.append("Imagen", curso.imagen);
-         }
-
-         await axios.put(`/api/Curso/${id}`, formData, {
-           headers: {
-             "Content-Type": "multipart/form-data",
-           },
-         });
-
-         // Actualizar la lista local si la API responde correctamente
-         const index = this.cursos.findIndex(c => c.Iidcurso === id);
-         if (index !== -1) {
-           this.cursos[index] = { ...curso };
-         }
-
-         alert("Curso actualizado exitosamente");
-       } catch (error) {
-         console.error("Error al actualizar el curso:", error);
-       }
-      },
-
-
-      // Método para editar un curso (llamado desde la vista)
-      editarCurso(cursoSeleccionado) {
-        this.curso = { ...cursoSeleccionado };
-      },
-
-      // Método para realizar la actualización en el formulario
-      async actualizarCurso() {
+      async updateCurso() {
         try {
-          if (!this.curso.iidcurso) {
-            console.error("Error: El curso no tiene un ID válido");
+          if (!this.curso.iidcurso || Number(this.curso.iidcurso) === 0) {
+            alert("ID de curso inválido para actualización");
             return;
           }
 
-          // Llamar al método updateCurso para actualizar el curso
-          await this.updateCurso(this.curso.iidcurso, this.curso);
+          const formData = new FormData();
+          formData.append("Nombre", this.curso.nombre);
+          formData.append("Descripcion", this.curso.descripcion);
+          formData.append("Iidcategoriacurso", Number(this.curso.iidcategoriacurso));
+          formData.append("Precio", Number(this.curso.precio));
+          formData.append("Cupon", this.curso.cupon);
+          formData.append("Bhabilitado", Number(this.curso.bhabilitado));
+          formData.append("IidCurso", this.curso.iidcurso);
 
-          // Resetear el formulario después de la actualización
+          // Solo incluir la imagen si se ha seleccionado una nueva (y es un File)
+          if (this.curso.imagen && this.curso.imagen instanceof File) {
+            formData.append("Imagen", this.curso.imagen);
+          }
+
+          // Depuración: imprime el contenido de formData
+          for (let pair of formData.entries()) {
+            console.log(`${pair[0]}: ${pair[1]}`);
+          }
+
+          // Enviar la solicitud PUT a la API con el ID en la URL
+          const response = await axios.put(`${API_URL}/${this.curso.iidcurso}`, formData, {
+            headers: { "Content-Type": "multipart/form-data" }
+          });
+
+          if (response.status === 200 || response.status === 204) {
+            alert("Curso actualizado exitosamente");
+          } else {
+            alert("Error al actualizar el curso");
+          }
+
+          // Recargar la lista de cursos
+          await this.obtenerCursos();
+
+          // Resetear formulario
           this.curso = {
             nombre: "",
             descripcion: "",
@@ -224,9 +221,11 @@ import axios from "axios";
             imagen: null,
             previewImagen: null,
             bhabilitado: 0,
+            iidcurso: 0
           };
         } catch (error) {
           console.error("Error al actualizar el curso:", error);
+          alert("Ocurrió un error al intentar actualizar el curso.");
         }
       },
 
@@ -239,6 +238,11 @@ import axios from "axios";
         console.error("Error al obtener los cursos:", error);
       }
     },
+
+      editarCurso(cursoSeleccionado) {
+        this.curso = { ...cursoSeleccionado };
+      },
+
 
 
 
